@@ -3,20 +3,30 @@
 class SimpleInterestCalculator:
     """
     Engine module for calculating Simple Interest values.
-    Designed to serve individual or combined outputs for UI rendering.
+    Includes validation guards to prevent app crashes from faulty user inputs.
     """
     
     def __init__(self, principal: float, annual_rate: float, time_years: float):
         """
-        Initializes the calculator state with user inputs.
-        
-        :param principal: The initial sum of money invested or borrowed (P).
-        :param annual_rate: The annual interest rate as a percentage (R, e.g., 5.5 for 5.5%).
-        :param time_years: The length of the investment/loan term in years (T).
+        Initialises the calculator state with user inputs and validates them.
         """
-        self.principal = float(principal)
-        self.rate_decimal = float(annual_rate) / 100.0
-        self.time_years = float(time_years)
+        # Validate that inputs are real numbers and are not negative
+        try:
+            self.principal = float(principal)
+            self.rate_decimal = float(annual_rate) / 100.0
+            self.time_years = float(time_years)
+        except (ValueError, TypeError):
+            raise ValueError("Inputs must be valid numbers.")
+
+        # Business Logic Validation (Error Cautioning)
+        if self.principal < 0:
+            raise ValueError("Principal amount cannot be negative.")
+            
+        if self.rate_decimal < 0:
+            raise ValueError("Interest rate cannot be negative.")
+            
+        if self.time_years <= 0:
+            raise ValueError("Time duration must be greater than zero years.")
 
     def get_interest_only(self) -> float:
         """
@@ -29,7 +39,7 @@ class SimpleInterestCalculator:
     def get_total_amount(self) -> float:
         """
         Calculates and returns the final total maturity amount (Principal + Interest).
-        Formula: A = P * (1 + R * T)
+        Formula: A = P + I
         """
-        total_amount = self.principal * (1.0 + (self.rate_decimal * self.time_years))
+        total_amount = self.principal + self.get_interest_only()
         return round(total_amount, 2)
